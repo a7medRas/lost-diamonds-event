@@ -1,76 +1,64 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>خريطة الماس المفقود</title>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600&display=swap" rel="stylesheet" />
   <style>
     body{margin:0;font-family:'Cairo',sans-serif;background:#0b1220;color:#fff}
     .bg{position:fixed;inset:0;z-index:-2;background-size:cover;background-position:center}
     .overlay{position:fixed;inset:0;z-index:-1;background:rgba(0,0,0,.55)}
     .page{padding:20px;max-width:1000px;margin:auto;text-align:center}
 
-    /* اللوجو */
-    .brandbar img{max-height:120px;transform:scale(1.78);margin-bottom:10px}
+    /* اللوجو مكبر 78% */
+    .brandbar img{max-height:120px;transform:scale(1.78);transform-origin:center;margin-bottom:10px}
 
-    h1{margin:10px 0;background:linear-gradient(90deg,#67e8f9,#a78bfa,#facc15);
-        -webkit-background-clip:text;color:transparent}
+    h1{margin:10px 0;background:linear-gradient(90deg,#67e8f9,#a78bfa,#facc15);-webkit-background-clip:text;color:transparent}
     .ribbons{display:flex;gap:10px;justify-content:center;margin:15px 0;flex-wrap:wrap}
     .rib{padding:6px 12px;border-radius:20px;font-weight:bold}
     .rib.basic{background:#22d3ee;color:#000}
     .rib.rare{background:#a78bfa}
     .rib.legend{background:#facc15;color:#000}
 
+    /* أزرار تغيير المستوى */
     .level-buttons{margin:15px 0;display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
-    .lvl-btn{
-      font-family:'Cairo',sans-serif;
-      padding:10px 20px;border:none;border-radius:12px;
-      font-weight:bold;font-size:16px;cursor:pointer;
-      transition:all .3s ease;
-    }
+    .lvl-btn{font-family:'Cairo',sans-serif;padding:10px 20px;border:none;border-radius:12px;font-weight:bold;font-size:16px;cursor:pointer;transition:all .3s}
     .lvl-btn:hover{transform:scale(1.05)}
     .lvl-btn.glow{background:#67e8f9;color:#0b1220}
     .lvl-btn.cave{background:#7c3aed;color:#fff}
     .lvl-btn.throne{background:#facc15;color:#0b1220}
-    .lvl-btn.active{box-shadow:0 0 12px 3px rgba(255,255,255,.7);
-      animation:glowPulse 1.5s infinite alternate}
-    @keyframes glowPulse{from{box-shadow:0 0 12px 3px rgba(255,255,255,.6);}
-      to{box-shadow:0 0 22px 6px rgba(255,255,255,.9);}}
+    .lvl-btn.active{box-shadow:0 0 12px 3px rgba(255,255,255,.7);animation:glowPulse 1.5s infinite alternate}
+    @keyframes glowPulse{from{box-shadow:0 0 12px 3px rgba(255,255,255,.6)}to{box-shadow:0 0 22px 6px rgba(255,255,255,.9)}}
 
     .board{background:rgba(255,255,255,.06);border-radius:16px;padding:15px;margin-top:10px}
-    .board .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;
-      transform:scale(0.75);margin:auto}
 
-    .cell{aspect-ratio:1/1;border-radius:12px;display:flex;align-items:center;
-      justify-content:center;font-weight:bold;cursor:pointer;position:relative;
-      overflow:hidden;color:#fff}
+    /* الشبكة مصغّرة 25% */
+    .board .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;transform:scale(0.75);transform-origin:center;margin:auto}
+
+    /* خلايا الجوائز + لمعة متحركة */
+    .cell{aspect-ratio:1/1;border-radius:12px;display:flex;align-items:center;justify-content:center;font-weight:bold;cursor:pointer;position:relative;overflow:hidden;color:#fff}
     .cell.active{outline:3px solid #fff}
     .cell.win{animation:winPulse 1s ease-in-out 2}
     @keyframes winPulse{0%,100%{filter:brightness(1)}50%{filter:brightness(1.6)}}
-    .cell::after{content:"";position:absolute;top:-50%;left:-50%;width:200%;height:200%;
-      background:linear-gradient(120deg,transparent 0%,rgba(255,255,255,0.25) 50%,transparent 100%);
-      transform:rotate(25deg);animation:shineMove 3s infinite}
-    @keyframes shineMove{0%{transform:translateX(-100%) rotate(25deg);}
-      60%{transform:translateX(100%) rotate(25deg);}
-      100%{transform:translateX(100%) rotate(25deg);}}
+    .cell::after{content:"";position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:linear-gradient(120deg,transparent 0%,rgba(255,255,255,.25) 50%,transparent 100%);transform:rotate(25deg);animation:shineMove 3s infinite}
+    @keyframes shineMove{0%{transform:translateX(-100%) rotate(25deg)}60%{transform:translateX(100%) rotate(25deg)}100%{transform:translateX(100%) rotate(25deg)}}
 
     .actions{margin:15px 0;display:flex;gap:15px;justify-content:center}
     .btn{padding:10px 20px;border:none;border-radius:8px;font-weight:bold;cursor:pointer}
     .btn.gold{background:#facc15;color:#000}
     .btn.teal{background:#22d3ee;color:#000}
 
+    /* التراكر + progress bar */
     .tracker{margin-top:15px;padding:15px;background:rgba(255,255,255,.08);border-radius:14px}
     .tracker h3{margin:0 0 10px;color:#facc15}
     .tgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
     .kv{background:rgba(0,0,0,.3);padding:10px;border-radius:10px}
     .kv h6{margin:0 0 5px;font-size:12px;opacity:.8}
     .kv b{font-size:16px}
-
-    /* progress bar */
     .progress-bar{height:12px;background:#333;border-radius:8px;overflow:hidden;margin-top:5px}
-    .progress-fill{height:100%;width:0;background:linear-gradient(90deg,#22d3ee,#facc15);
-      transition:width 1s ease}
-    
+    .progress-fill{height:100%;width:0;background:linear-gradient(90deg,#22d3ee,#facc15);transition:width 1s ease}
+
+    /* مودال الفوز */
     .modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.6)}
     .modal[open]{display:flex}
     .dialog{background:#0b1220;padding:20px;border-radius:12px;text-align:center}
@@ -78,9 +66,15 @@
   </style>
 </head>
 <body>
-  <div class="bg" id="bg"></div><div class="overlay"></div>
+  <div class="bg" id="bg"></div>
+  <div class="overlay"></div>
+
   <div class="page">
-    <div class="brandbar"><img src="images/Gemini_Generated_Image_tq9qfstq9qfstq9q (1).png" alt="شعار"></div>
+    <!-- اللوجو باسمك الأصلي (بدون images/) -->
+    <div class="brandbar">
+      <img src="Gemini_Generated_Image_tq9qfstq9qfstq9q (1).png" alt="شعار الحدث" />
+    </div>
+
     <h1>خريطة الماس المفقود</h1>
 
     <div class="ribbons">
@@ -90,9 +84,9 @@
     </div>
 
     <div class="level-buttons">
-      <button class="lvl-btn glow" onclick="setLevel('basic')">⚪ بداية اللمعان</button>
-      <button class="lvl-btn cave" onclick="setLevel('rare')">🟣 كهوف البلور الأزرق</button>
-      <button class="lvl-btn throne" onclick="setLevel('legend')">🟡 عرش الماس الأسطوري</button>
+      <button class="lvl-btn glow"    onclick="setLevel('basic')">⚪ بداية اللمعان</button>
+      <button class="lvl-btn cave"    onclick="setLevel('rare')">🟣 كهوف البلور الأزرق</button>
+      <button class="lvl-btn throne"  onclick="setLevel('legend')">🟡 عرش الماس الأسطوري</button>
     </div>
 
     <div class="actions">
@@ -100,7 +94,9 @@
       <button class="btn teal" id="spin10">تدوير سريع (10)</button>
     </div>
 
-    <section class="board"><div class="grid" id="grid"></div></section>
+    <section class="board">
+      <div class="grid" id="grid"></div>
+    </section>
 
     <section class="tracker">
       <h3>💠 نظام متابعة التقدم</h3>
@@ -117,82 +113,110 @@
     </section>
   </div>
 
+  <!-- نافذة الفوز -->
   <div class="modal" id="modal">
-    <div class="dialog"><h3>🎉 مبروك!</h3><p id="winText"></p><button onclick="modal.removeAttribute('open')">حسناً</button></div>
+    <div class="dialog">
+      <h3>🎉 مبروك!</h3>
+      <p id="winText"></p>
+      <button onclick="modal.removeAttribute('open')">حسناً</button>
+    </div>
   </div>
 
   <script>
-    const LEVELS={
-      basic:{bg:"images/Gemini_Generated_Image_x9vipkx9vipkx9vi.png",
-        rewards:["💎 ×50","💎 ×100","💎 ×200","💎 ×500","💎 ×1000","إطار","تأثير","لقب","هدية"],
-        cellBg:"linear-gradient(135deg,#1e3a8a,#06b6d4)",cellColor:"#fff",charge:1000},
-      rare:{bg:"images/Gemini_Generated_Image_ndhq78ndhq78ndhq.png",
-        rewards:["💎 ×300","💎 ×600","💎 ×900","💎 ×1200","💎 ×1500","تاج","إطار ذهبي","أجنحة","لقب نادر"],
-        cellBg:"linear-gradient(135deg,#6d28d9,#93c5fd)",cellColor:"#fff",charge:10000},
-      legend:{bg:"images/Gemini_Generated_Image_a1w5pca1w5pca1w5.png",
-        rewards:["💎 ×2000","💎 ×3000","💎 ×4000","💎 ×5000","💎 ×10000","تاج أسطوري","إطار ماسي","أجنحة أسطورية","لقب أسطوري"],
-        cellBg:"linear-gradient(135deg,#fde68a,#78350f)",cellColor:"#000",charge:100000}
+    /* تعريف المستويات + ألوان الشبكة + قيم الشحن */
+    const LEVELS = {
+      basic: {
+        bg: "Gemini_Generated_Image_x9vipkx9vipkx9vi.png",
+        rewards: ["💎 ×50","💎 ×100","💎 ×200","💎 ×500","💎 ×1000","إطار","تأثير","لقب","هدية"],
+        cellBg: "linear-gradient(135deg,#1e3a8a,#06b6d4)",  // أزرق -> أخضر سماوي
+        cellColor: "#fff",
+        charge: 1000
+      },
+      rare: {
+        bg: "Gemini_Generated_Image_ndhq78ndhq78ndhq.png",
+        rewards: ["💎 ×300","💎 ×600","💎 ×900","💎 ×1200","💎 ×1500","تاج","إطار ذهبي","أجنحة","لقب نادر"],
+        cellBg: "linear-gradient(135deg,#6d28d9,#93c5fd)",   // بنفسجي -> لبني
+        cellColor: "#fff",
+        charge: 10000
+      },
+      legend: {
+        bg: "Gemini_Generated_Image_a1w5pca1w5pca1w5.png",
+        rewards: ["💎 ×2000","💎 ×3000","💎 ×4000","💎 ×5000","💎 ×10000","تاج أسطوري","إطار ماسي","أجنحة أسطورية","لقب أسطوري"],
+        cellBg: "linear-gradient(135deg,#fde68a,#78350f)",   // ذهبي فاتح -> بني
+        cellColor: "#000",
+        charge: 100000
+      }
     };
 
-    let currentLevel="basic", totalDiamonds=12400;
-    const grid=document.getElementById("grid"),bg=document.getElementById("bg");
-    const progressFill=document.getElementById("progressFill");
+    let currentLevel = "basic";
+    let totalDiamonds = 12400; // اجمالي الألماس المشحون (قيمة مبدئية)
+
+    const grid = document.getElementById("grid");
+    const bg = document.getElementById("bg");
+    const progressFill = document.getElementById("progressFill");
 
     function setLevel(level){
-      currentLevel=level;
-      document.getElementById("ribLevel").textContent="المستوى: "+
-        (level==="basic"?"بداية اللمعان":level==="rare"?"كهوف البلور الأزرق":"عرش الماس الأسطوري");
-      document.getElementById("trkLevel").textContent=
-        (level==="basic"?"بداية اللمعان":level==="rare"?"كهوف البلور الأزرق":"عرش الماس الأسطوري");
-      document.getElementById("trkNeed").textContent=LEVELS[level].charge+" ماس";
-      updateProgress();
-      buildGrid(level);
+      currentLevel = level;
+      document.getElementById("ribLevel").textContent =
+        "المستوى: " + (level==="basic" ? "بداية اللمعان" : level==="rare" ? "كهوف البلور الأزرق" : "عرش الماس الأسطوري");
+      document.getElementById("trkLevel").textContent =
+        (level==="basic" ? "بداية اللمعان" : level==="rare" ? "كهوف البلور الأزرق" : "عرش الماس الأسطوري");
+      document.getElementById("trkNeed").textContent = LEVELS[level].charge + " ماس";
       document.querySelectorAll('.lvl-btn').forEach(b=>b.classList.remove('active'));
-      if(level==="basic") document.querySelector('.lvl-btn.glow').classList.add('active');
-      if(level==="rare") document.querySelector('.lvl-btn.cave').classList.add('active');
+      if(level==="basic")  document.querySelector('.lvl-btn.glow').classList.add('active');
+      if(level==="rare")   document.querySelector('.lvl-btn.cave').classList.add('active');
       if(level==="legend") document.querySelector('.lvl-btn.throne').classList.add('active');
+      buildGrid(level);
+      updateProgress();
     }
 
     function buildGrid(level){
-      grid.innerHTML=""; bg.style.backgroundImage=`url(${LEVELS[level].bg})`;
+      grid.innerHTML = "";
+      bg.style.backgroundImage = `url(${LEVELS[level].bg})`;
       LEVELS[level].rewards.forEach(val=>{
-        const cell=document.createElement("div");
-        cell.className="cell";cell.style.background=LEVELS[level].cellBg;cell.style.color=LEVELS[level].cellColor;
-        cell.textContent=val;grid.appendChild(cell);
+        const cell = document.createElement("div");
+        cell.className = "cell";
+        cell.style.background = LEVELS[level].cellBg;
+        cell.style.color = LEVELS[level].cellColor;
+        cell.textContent = val;
+        grid.appendChild(cell);
       });
     }
 
     function updateProgress(){
-      document.getElementById("trkDiamonds").textContent=totalDiamonds;
-      let needed=LEVELS[currentLevel].charge;
-      let percent=Math.min(100,(totalDiamonds/needed)*100);
-      progressFill.style.width=percent+"%";
+      document.getElementById("trkDiamonds").textContent = totalDiamonds;
+      const needed = LEVELS[currentLevel].charge;
+      const percent = Math.min(100, (totalDiamonds / needed) * 100);
+      progressFill.style.width = percent + "%";
     }
 
     async function spinAnimation(times=1){
       for(let t=0;t<times;t++){
-        const cells=[...document.querySelectorAll('.cell')];
-        let index=0,loops=0,winningIndex=Math.floor(Math.random()*cells.length);
+        const cells = [...document.querySelectorAll('.cell')];
+        let index=0, loops=0, winningIndex=Math.floor(Math.random()*cells.length);
         await new Promise(resolve=>{
           function step(){
             cells.forEach(c=>c.classList.remove("active"));
             cells[index].classList.add("active");
-            index=(index+1)%cells.length;loops++;
+            index=(index+1)%cells.length; loops++;
             if(loops>cells.length*3 && index===winningIndex){
               cells.forEach(c=>c.classList.remove("active"));
-              const winCell=cells[winningIndex];winCell.classList.add("win");
-              document.getElementById("winText").textContent=`لقد حصلت على ${winCell.textContent}`;
+              const winCell=cells[winningIndex];
+              winCell.classList.add("win");
+              document.getElementById("winText").textContent = `لقد حصلت على ${winCell.textContent}`;
               document.getElementById("modal").setAttribute("open","");
               resolve();
-            } else setTimeout(step,100);
-          } step();
+            }else setTimeout(step,100);
+          }
+          step();
         });
       }
     }
 
-    document.getElementById("spin1").addEventListener("click",()=>spinAnimation(1));
+    document.getElementById("spin1").addEventListener("click", ()=>spinAnimation(1));
     document.getElementById("spin10").addEventListener("click",()=>spinAnimation(10));
 
+    // تشغيل مبدئي
     setLevel("basic");
     updateProgress();
   </script>
