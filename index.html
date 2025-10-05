@@ -1,201 +1,200 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>خريطة الماس المفقود – الحدث الكامل</title>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <title>خريطة الماس المفقود</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@600&display=swap" rel="stylesheet">
   <style>
-    :root{ --text:#eaf6ff; --panel:rgba(255,255,255,.06); --gold:#ffd700; --accent:#67e8f9; --purple:#a78bfa; --shadow:0 20px 45px rgba(0,0,0,.35), inset 0 0 20px rgba(255,255,255,.05); }
-    *{box-sizing:border-box}
-    body{margin:0; font-family:'Cairo',system-ui,sans-serif; color:var(--text); background:#0b1220; min-height:100vh;}
-    .bg{position:fixed; inset:0; z-index:-2; background-position:center; background-size:cover; background-repeat:no-repeat; filter:saturate(110%) contrast(1.02) brightness(.9); opacity:.7;}
-    .overlay{position:fixed; inset:0; z-index:-1; background:linear-gradient(180deg, rgba(3,6,23,.55), rgba(3,6,23,.35));}
-    .page{position:relative; z-index:1; padding:18px; display:flex; flex-direction:column; align-items:center; gap:12px}
-    .wrap{width:min(1140px, 96%); background:var(--panel); border:1px solid rgba(255,255,255,.08); border-radius:20px; box-shadow:var(--shadow); backdrop-filter:blur(8px); padding:16px}
-    .brandbar{display:flex; justify-content:center; padding:6px 0 12px}
-    .brandbar img{max-height:86px; filter: drop-shadow(0 8px 24px rgba(0,0,0,.4));}
-    header{display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; margin-bottom:8px}
-    .title{margin:0; font-weight:900; font-size:clamp(20px,3vw,28px); background:linear-gradient(90deg,#67e8f9,#a78bfa,#facc15); -webkit-background-clip:text; background-clip:text; color:transparent}
-    .tabs{display:flex; gap:8px; flex-wrap:wrap}
-    .tab{cursor:pointer; border:0; padding:10px 14px; border-radius:12px; font-weight:800; color:#08101e; background:linear-gradient(135deg,#dbeafe,#a5f3fc); box-shadow:0 8px 20px rgba(0,224,255,.15); transition:.2s}
-    .tab[data-active="true"]{ background:linear-gradient(135deg,#67e8f9,#a78bfa); transform:translateY(-1px) }
-    .ribbons{display:flex; gap:10px; justify-content:center; padding:8px 12px}
-    .rib{padding:6px 12px; border-radius:999px; font-weight:800; border:1px solid rgba(255,255,255,.18)}
-    .rib.basic{background:linear-gradient(135deg,#67e8f9,#22d3ee)}
-    .rib.rare{background:linear-gradient(135deg,#a78bfa,#c084fc)}
-    .rib.legend{background:linear-gradient(135deg,#facc15,#f59e0b); color:#1a1205}
-    .topbar{display:flex; gap:10px; align-items:center; justify-content:space-between; flex-wrap:wrap; margin:8px 0}
-    .meter{flex:1; min-width:260px; background:rgba(255,255,255,.06); border-radius:12px; overflow:hidden; border:1px solid rgba(255,255,255,.1)}
-    .meter-fill{height:14px; width:0%; background:linear-gradient(90deg,#67e8f9,#22d3ee); transition:width 1s ease-in-out}
-    .spins{display:flex; align-items:center; gap:8px; font-weight:800}
-    .spins .num{font-size:20px; padding:4px 10px; border-radius:10px; background:rgba(255,255,255,.08); box-shadow: inset 0 0 0 1px rgba(255,255,255,.12)}
-    .actions{display:flex; gap:8px; justify-content:center; margin:10px 0}
-    .btn{border:0; cursor:pointer; padding:12px 18px; border-radius:12px; font-weight:800; color:#08101e; background:linear-gradient(90deg,#67e8f9,#a78bfa); box-shadow:0 10px 25px rgba(103,232,249,.25)}
-    .board{position:relative; padding:12px; border-radius:18px; background:rgba(255,255,255,.05); box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)}
-    .grid{display:grid; grid-template-columns:repeat(3,1fr); gap:12px}
-    .cell{position:relative; aspect-ratio:1/1; border-radius:16px; overflow:hidden; cursor:pointer; user-select:none; transition:filter .2s, transform .18s}
-    .cell:hover{ filter:brightness(1.04) }
-    .inner{position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; text-align:center; padding:10px}
-    .icon{font-size:clamp(28px,4vw,44px); filter: drop-shadow(0 0 8px rgba(255,255,255,.35))}
-    .value{font-weight:900; font-size:clamp(14px,2.2vw,18px); letter-spacing:.3px; text-shadow:0 2px 10px rgba(0,0,0,.45)}
-    .cell::before, .cell::after{content:''; position:absolute; inset:0; border-radius:16px; pointer-events:none}
-    .cell::before{ border:2.5px solid rgba(255,255,255,.18); box-shadow: inset 0 0 0 1.5px rgba(255,255,255,.08), 0 0 0 1px rgba(0,0,0,.35); mix-blend-mode:screen }
-    .cell.active .inner{ box-shadow: inset 0 0 18px rgba(255,255,255,.15) }
-    .highlight{ position:absolute; inset:0; border-radius:16px; box-shadow: 0 0 0 3px rgba(255,255,255,.0), inset 0 0 0 3px rgba(255,255,255,.0); transition: box-shadow .08s }
-    .cell.active .highlight{ box-shadow: 0 0 0 3px rgba(255,255,255,.35), inset 0 0 0 3px rgba(255,255,255,.15) }
-    .cell.win{ animation: winPulse .8s ease-in-out 2 }
-    @keyframes winPulse{ 0%,100%{ filter:brightness(1) drop-shadow(0 0 0 rgba(255,255,255,0)) } 30%{ filter:brightness(1.25) drop-shadow(0 0 16px rgba(255,255,255,.9)) } 70%{ filter:brightness(1.15) drop-shadow(0 0 18px rgba(0,224,255,.8)) } }
-    .t-basic{ background: radial-gradient(160px 60px at 50% 20%, rgba(255,255,255,.16), transparent 60%), linear-gradient(160deg, #e6edf3 0%, #a8c3cc 35%, #57d4e3 100%) }
-    .t-basic .icon{ color:#bfefff } .t-basic .value{ color:#00E0FF }
-    .t-rare{ background: radial-gradient(180px 70px at 50% 18%, rgba(192,140,255,.22), transparent 65%), linear-gradient(165deg, #0e1222 0%, #142039 35%, #1c2d4a 55%, #2a1f44 100%) }
-    .t-rare .icon{ color:#c08cff } .t-rare .value{ color:#C08CFF }
-    .t-legend{ background: repeating-linear-gradient(135deg, rgba(255,255,255,.12) 0 2px, transparent 2px 8px), linear-gradient(160deg, #2b1d05 0%, #4a3208 40%, #7a520e 75%, #a57415 100%) }
-    .t-legend .icon{ color:#ffe08a } .t-legend .value{ color:#FFD700 }
-    .toast{ position:fixed; left:50%; bottom:90px; transform:translateX(-50%); background:rgba(12,18,30,.9); color:var(--text); padding:12px 16px; border-radius:12px; border:1px solid rgba(255,255,255,.1); box-shadow:var(--shadow); z-index:99; opacity:0 }
-    .toast.show{ animation: toastUp 1.6s ease forwards }
-    @keyframes toastUp{ 0%{opacity:0; transform:translate(-50%, 20px)} 20%{opacity:1; transform:translate(-50%, 0)} 80%{opacity:1} 100%{opacity:0; transform:translate(-50%, -20px)} }
-    .modal{ position:fixed; inset:0; display:none; align-items:center; justify-content:center; background:rgba(0,0,0,.55); z-index:110; padding:20px }
-    .modal[open]{ display:flex }
-    .dialog{ width:min(520px,96%); background:#0b1220; color:var(--text); border-radius:16px; padding:22px; border:1px solid rgba(255,255,255,.08); box-shadow:var(--shadow); text-align:center }
+    body{margin:0;font-family:'Cairo',sans-serif;background:#0b1220;color:#fff}
+    .bg{position:fixed;inset:0;z-index:-2;background-size:cover;background-position:center}
+    .overlay{position:fixed;inset:0;z-index:-1;background:rgba(0,0,0,.55)}
+    .page{padding:20px;max-width:1000px;margin:auto;text-align:center}
+
+    /* اللوجو */
+    .brandbar img{max-height:120px;transform:scale(1.78);margin-bottom:10px}
+
+    h1{margin:10px 0;background:linear-gradient(90deg,#67e8f9,#a78bfa,#facc15);
+        -webkit-background-clip:text;color:transparent}
+    .ribbons{display:flex;gap:10px;justify-content:center;margin:15px 0;flex-wrap:wrap}
+    .rib{padding:6px 12px;border-radius:20px;font-weight:bold}
+    .rib.basic{background:#22d3ee;color:#000}
+    .rib.rare{background:#a78bfa}
+    .rib.legend{background:#facc15;color:#000}
+
+    .level-buttons{margin:15px 0;display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+    .lvl-btn{
+      font-family:'Cairo',sans-serif;
+      padding:10px 20px;border:none;border-radius:12px;
+      font-weight:bold;font-size:16px;cursor:pointer;
+      transition:all .3s ease;
+    }
+    .lvl-btn:hover{transform:scale(1.05)}
+    .lvl-btn.glow{background:#67e8f9;color:#0b1220}
+    .lvl-btn.cave{background:#7c3aed;color:#fff}
+    .lvl-btn.throne{background:#facc15;color:#0b1220}
+    .lvl-btn.active{box-shadow:0 0 12px 3px rgba(255,255,255,.7);
+      animation:glowPulse 1.5s infinite alternate}
+    @keyframes glowPulse{from{box-shadow:0 0 12px 3px rgba(255,255,255,.6);}
+      to{box-shadow:0 0 22px 6px rgba(255,255,255,.9);}}
+
+    .board{background:rgba(255,255,255,.06);border-radius:16px;padding:15px;margin-top:10px}
+    .board .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;
+      transform:scale(0.75);margin:auto}
+
+    .cell{aspect-ratio:1/1;border-radius:12px;display:flex;align-items:center;
+      justify-content:center;font-weight:bold;cursor:pointer;position:relative;
+      overflow:hidden;color:#fff}
+    .cell.active{outline:3px solid #fff}
+    .cell.win{animation:winPulse 1s ease-in-out 2}
+    @keyframes winPulse{0%,100%{filter:brightness(1)}50%{filter:brightness(1.6)}}
+    .cell::after{content:"";position:absolute;top:-50%;left:-50%;width:200%;height:200%;
+      background:linear-gradient(120deg,transparent 0%,rgba(255,255,255,0.25) 50%,transparent 100%);
+      transform:rotate(25deg);animation:shineMove 3s infinite}
+    @keyframes shineMove{0%{transform:translateX(-100%) rotate(25deg);}
+      60%{transform:translateX(100%) rotate(25deg);}
+      100%{transform:translateX(100%) rotate(25deg);}}
+
+    .actions{margin:15px 0;display:flex;gap:15px;justify-content:center}
+    .btn{padding:10px 20px;border:none;border-radius:8px;font-weight:bold;cursor:pointer}
+    .btn.gold{background:#facc15;color:#000}
+    .btn.teal{background:#22d3ee;color:#000}
+
+    .tracker{margin-top:15px;padding:15px;background:rgba(255,255,255,.08);border-radius:14px}
+    .tracker h3{margin:0 0 10px;color:#facc15}
+    .tgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+    .kv{background:rgba(0,0,0,.3);padding:10px;border-radius:10px}
+    .kv h6{margin:0 0 5px;font-size:12px;opacity:.8}
+    .kv b{font-size:16px}
+
+    /* progress bar */
+    .progress-bar{height:12px;background:#333;border-radius:8px;overflow:hidden;margin-top:5px}
+    .progress-fill{height:100%;width:0;background:linear-gradient(90deg,#22d3ee,#facc15);
+      transition:width 1s ease}
+    
+    .modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.6)}
+    .modal[open]{display:flex}
+    .dialog{background:#0b1220;padding:20px;border-radius:12px;text-align:center}
+    .dialog h3{margin:0 0 10px;color:#facc15}
   </style>
 </head>
 <body>
-  <div class="bg" id="bg"></div>
-  <div class="overlay"></div>
+  <div class="bg" id="bg"></div><div class="overlay"></div>
   <div class="page">
-    <div class="brandbar"><img src="images/Gemini_Generated_Image_tq9qfstq9qfstq9q (1).png" alt="شعار الحدث"></div>
-    <div class="wrap">
-      <header>
-        <h1 class="title">منطقة الجوائز – خريطة الماس المفقود</h1>
-        <div class="tabs" id="tabs">
-          <button class="tab" data-level="basic" data-active="true">🩵 مكتشف الماسات (عادي)</button>
-          <button class="tab" data-level="rare">💜 صائد الكنز (نادر)</button>
-          <button class="tab" data-level="legend">👑 سيد الماسات (أسطوري)</button>
+    <div class="brandbar"><img src="images/Gemini_Generated_Image_tq9qfstq9qfstq9q (1).png" alt="شعار"></div>
+    <h1>خريطة الماس المفقود</h1>
+
+    <div class="ribbons">
+      <span class="rib basic" id="ribLevel">المستوى: بداية اللمعان</span>
+      <span class="rib rare" id="ribDiamonds">الألماس المشحون: 12,400</span>
+      <span class="rib legend" id="ribRank">الترتيب: #7</span>
+    </div>
+
+    <div class="level-buttons">
+      <button class="lvl-btn glow" onclick="setLevel('basic')">⚪ بداية اللمعان</button>
+      <button class="lvl-btn cave" onclick="setLevel('rare')">🟣 كهوف البلور الأزرق</button>
+      <button class="lvl-btn throne" onclick="setLevel('legend')">🟡 عرش الماس الأسطوري</button>
+    </div>
+
+    <div class="actions">
+      <button class="btn gold" id="spin1">تدوير 🎲 (1)</button>
+      <button class="btn teal" id="spin10">تدوير سريع (10)</button>
+    </div>
+
+    <section class="board"><div class="grid" id="grid"></div></section>
+
+    <section class="tracker">
+      <h3>💠 نظام متابعة التقدم</h3>
+      <div class="tgrid">
+        <div class="kv"><h6>🧭 المستوى الحالي</h6><b id="trkLevel">بداية اللمعان</b></div>
+        <div class="kv">
+          <h6>💎 إجمالي الألماس المشحون</h6>
+          <b id="trkDiamonds">12400</b>
+          <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
         </div>
-      </header>
-      <div class="ribbons">
-        <span class="rib basic" id="ribLevel">المستوى: عادي</span>
-        <span class="rib rare" id="ribDiamonds">الألماس: 12,400</span>
-        <span class="rib legend" id="ribRank">الترتيب: #7</span>
+        <div class="kv"><h6>🔁 اللفات المتبقية</h6><b id="trkSpins">3</b></div>
+        <div class="kv"><h6>🎯 الشحن المطلوب</h6><b id="trkNeed">1000 ماس</b></div>
       </div>
-      <div class="topbar">
-        <div style="flex:1"></div>
-        <div class="spins">لفات متاحة: <span class="num" id="spinsNum">3</span></div>
-        <div class="meter" id="meter"><div class="meter-fill" id="meterFill"></div></div>
-      </div>
-      <div class="actions">
-        <button class="btn" id="spin1">تدوير 🎲 (1)</button>
-        <button class="btn" id="spin10">تدوير سريع (10)</button>
-      </div>
-      <section class="board">
-        <div class="grid" id="grid" aria-live="polite"></div>
-      </section>
-    </div>
+    </section>
   </div>
-  <div class="toast" id="toast"></div>
+
   <div class="modal" id="modal">
-    <div class="dialog">
-      <h3 id="winTitle">🎉 مبروك!</h3>
-      <p id="winText" style="font-weight:700"></p>
-      <button class="btn" id="closeModal">حسناً</button>
-    </div>
+    <div class="dialog"><h3>🎉 مبروك!</h3><p id="winText"></p><button onclick="modal.removeAttribute('open')">حسناً</button></div>
   </div>
+
   <script>
-    const LEVEL_BG = {
-      basic: "images/Gemini_Generated_Image_a1w5pca1w5pca1w5.png",
-      rare:  "images/Gemini_Generated_Image_ndhq78ndhq78ndhq.png",
-      legend:"images/Gemini_Generated_Image_x9vipkx9vipkx9vi.png"
+    const LEVELS={
+      basic:{bg:"images/Gemini_Generated_Image_x9vipkx9vipkx9vi.png",
+        rewards:["💎 ×50","💎 ×100","💎 ×200","💎 ×500","💎 ×1000","إطار","تأثير","لقب","هدية"],
+        cellBg:"linear-gradient(135deg,#1e3a8a,#06b6d4)",cellColor:"#fff",charge:1000},
+      rare:{bg:"images/Gemini_Generated_Image_ndhq78ndhq78ndhq.png",
+        rewards:["💎 ×300","💎 ×600","💎 ×900","💎 ×1200","💎 ×1500","تاج","إطار ذهبي","أجنحة","لقب نادر"],
+        cellBg:"linear-gradient(135deg,#6d28d9,#93c5fd)",cellColor:"#fff",charge:10000},
+      legend:{bg:"images/Gemini_Generated_Image_a1w5pca1w5pca1w5.png",
+        rewards:["💎 ×2000","💎 ×3000","💎 ×4000","💎 ×5000","💎 ×10000","تاج أسطوري","إطار ماسي","أجنحة أسطورية","لقب أسطوري"],
+        cellBg:"linear-gradient(135deg,#fde68a,#78350f)",cellColor:"#000",charge:100000}
     };
-    const state = { username:'Theeb', levelKey:'basic', totalDiamonds:12400, spinsAvailable:3, rank:7, diamondsForNextSpin:10000 };
-    const REWARDS = {
-      basic:["💎 ×50","💎 ×100","💎 ×150","💎 ×200","💎 ×500","💎 ×1000","إطار فضي لمدة يوم","تأثير إضاءة حول الصورة الشخصية ✨","لقب مؤقت «مكتشف الماسات»"],
-      rare:["💎 ×500","💎 ×1000","💎 ×3000","💎 ×5000","💎 ×10000","تأثير دخول نادر 💫","لقب «صائد الكنز» 🏆","إطار ماسي متوهج لمدة 3 أيام","خلفية بروفايل متحركة 💥"],
-      legend:["💎 ×10,000","💎 ×20,000","💎 ×30,000","💎 ×50,000","تاج دائم 👑","بطاقة VIP أسبوعية 🌟","تأثير بث متحرك 🔥","لقب «ملك الماسات» 💎","هدية سرية أسطورية (يُفتح عشوائيًا 🎁)"]
-    };
-    const THEME_CLASS = { basic:'t-basic', rare:'t-rare', legend:'t-legend' };
 
-    const bg = document.getElementById('bg'), grid = document.getElementById('grid'), tabs = document.getElementById('tabs');
-    const ribLevel = document.getElementById('ribLevel'), ribDiamonds = document.getElementById('ribDiamonds'), ribRank = document.getElementById('ribRank');
-    const spinsNum = document.getElementById('spinsNum'), meter = document.getElementById('meter'), meterFill = document.getElementById('meterFill');
-    const toast = document.getElementById('toast'); const modal = document.getElementById('modal'), winText = document.getElementById('winText'), closeModal = document.getElementById('closeModal');
+    let currentLevel="basic", totalDiamonds=12400;
+    const grid=document.getElementById("grid"),bg=document.getElementById("bg");
+    const progressFill=document.getElementById("progressFill");
 
-    function setBackground(key){ bg.style.backgroundImage = `url('${LEVEL_BG[key]}')`; }
-    function updateHeader(){
-      spinsNum.textContent = state.spinsAvailable;
-      ribLevel.textContent = `المستوى: ${ state.levelKey==='basic'?'عادي':state.levelKey==='rare'?'نادر':'أسطوري' }`;
-      ribDiamonds.textContent = `الألماس: ${ state.totalDiamonds.toLocaleString() }`;
-      ribRank.textContent = `الترتيب: #${ state.rank }`;
-      const ratio = Math.min(1, state.totalDiamonds / state.diamondsForNextSpin);
-      meterFill.style.width = (ratio*100).toFixed(1) + '%';
+    function setLevel(level){
+      currentLevel=level;
+      document.getElementById("ribLevel").textContent="المستوى: "+
+        (level==="basic"?"بداية اللمعان":level==="rare"?"كهوف البلور الأزرق":"عرش الماس الأسطوري");
+      document.getElementById("trkLevel").textContent=
+        (level==="basic"?"بداية اللمعان":level==="rare"?"كهوف البلور الأزرق":"عرش الماس الأسطوري");
+      document.getElementById("trkNeed").textContent=LEVELS[level].charge+" ماس";
+      updateProgress();
+      buildGrid(level);
+      document.querySelectorAll('.lvl-btn').forEach(b=>b.classList.remove('active'));
+      if(level==="basic") document.querySelector('.lvl-btn.glow').classList.add('active');
+      if(level==="rare") document.querySelector('.lvl-btn.cave').classList.add('active');
+      if(level==="legend") document.querySelector('.lvl-btn.throne').classList.add('active');
     }
-    function buildGrid(levelKey){
-      setBackground(levelKey);
-      grid.innerHTML = '';
-      REWARDS[levelKey].forEach((val,i)=>{
-        const cell = document.createElement('button');
-        cell.className = `cell ${THEME_CLASS[levelKey]}`;
-        cell.setAttribute('aria-label', `المربع ${i+1}: ${val}`);
-        const isDiamond = /^💎/.test(val);
-        cell.innerHTML = `
-          <div class="inner">
-            <div class="icon">💎</div>
-            <div class="value">${ isDiamond ? ('× '+ val.replace(/[^\d,]+/g,'').replace(/,(?=\d{3})/g,',')) : val }</div>
-          </div>
-          <span class="highlight"></span>`;
-        if(!isDiamond){ cell.querySelector('.inner .value').textContent = val; }
-        grid.appendChild(cell);
+
+    function buildGrid(level){
+      grid.innerHTML=""; bg.style.backgroundImage=`url(${LEVELS[level].bg})`;
+      LEVELS[level].rewards.forEach(val=>{
+        const cell=document.createElement("div");
+        cell.className="cell";cell.style.background=LEVELS[level].cellBg;cell.style.color=LEVELS[level].cellColor;
+        cell.textContent=val;grid.appendChild(cell);
       });
     }
-    let audioCtx;
-    function clickSound(){ if(!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)(); const o=audioCtx.createOscillator(), g=audioCtx.createGain(); o.type='square'; o.frequency.setValueAtTime(1100,audioCtx.currentTime); o.frequency.exponentialRampToValueAtTime(400,audioCtx.currentTime+.08); g.gain.setValueAtTime(.06,audioCtx.currentTime); g.gain.exponentialRampToValueAtTime(.0001,audioCtx.currentTime+.09); o.connect(g).connect(audioCtx.destination); o.start(); o.stop(audioCtx.currentTime+.1);}
-    function winSound(){ if(!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)(); const o=audioCtx.createOscillator(), g=audioCtx.createGain(); o.type='triangle'; o.frequency.setValueAtTime(600,audioCtx.currentTime); o.frequency.exponentialRampToValueAtTime(1800,audioCtx.currentTime+.25); g.gain.setValueAtTime(.04,audioCtx.currentTime); g.gain.exponentialRampToValueAtTime(.0001,audioCtx.currentTime+.4); o.connect(g).connect(audioCtx.destination); o.start(); o.stop(audioCtx.currentTime+.42);}
-    function showToast(msg){ toast.textContent=msg; toast.classList.remove('show'); void toast.offsetWidth; toast.classList.add('show'); }
-    function showWinModal(text){ winText.textContent = text; modal.setAttribute('open',''); }
-    closeModal.addEventListener('click', ()=> modal.removeAttribute('open'));
-    modal.addEventListener('click', (e)=>{ if(e.target===modal) modal.removeAttribute('open'); });
-    function animateSelection(cells, winningIndex){
-      return new Promise((resolve)=>{
-        let index=0, speed=100, loops=0; const totalRounds=3;
-        const step=()=>{
-          cells.forEach(c=>c.classList.remove('active'));
-          cells[index].classList.add('active'); clickSound();
-          index=(index+1)%cells.length; loops++;
-          if(loops < totalRounds*cells.length) speed=Math.max(28, speed-4); else speed=Math.min(520, speed+18);
-          if(speed>500 && ((index+cells.length-1)%cells.length)===winningIndex){ cells.forEach(c=>c.classList.remove('active')); resolve(); }
-          else setTimeout(step, speed);
-        }; step();
-      });
+
+    function updateProgress(){
+      document.getElementById("trkDiamonds").textContent=totalDiamonds;
+      let needed=LEVELS[currentLevel].charge;
+      let percent=Math.min(100,(totalDiamonds/needed)*100);
+      progressFill.style.width=percent+"%";
     }
-    function flyShards(fromEl){
-      const rect = fromEl.getBoundingClientRect(), target = document.querySelector('.wrap').getBoundingClientRect();
-      const startX = rect.left+rect.width/2, startY = rect.top+rect.height/2;
-      const endX = target.left+target.width/2, endY = target.top+20;
-      const count = 12 + Math.floor(Math.random()*6);
-      for(let i=0;i<count;i++){ const s=document.createElement('div'); s.textContent='💎'; s.style.cssText='position:fixed;z-index:95;filter:drop-shadow(0 0 8px rgba(255,255,255,.5))'; s.style.left=startX+'px'; s.style.top=startY+'px'; document.body.appendChild(s); const dx=endX-startX+(Math.random()*60-30), dy=endY-startY+(Math.random()*20-10); const dur=600+Math.random()*300; s.animate([{transform:'translate(0,0) scale(1)',opacity:1},{transform:`translate(${dx}px,${dy}px) scale(.6)`,opacity:.1}],{duration:dur,easing:'cubic-bezier(.2,.9,.2,1)',fill:'forwards'}); setTimeout(()=>s.remove(), dur+60); }
-    }
-    async function doSpin(times=1){
-      const cells=[...document.querySelectorAll('.cell')]; if(!cells.length) return;
+
+    async function spinAnimation(times=1){
       for(let t=0;t<times;t++){
-        if(state.spinsAvailable<=0){ showToast('لا توجد لفات متاحة'); break; }
-        state.spinsAvailable--; updateHeader();
-        const win = Math.floor(Math.random()*9);
-        await animateSelection(cells, win);
-        const winCell = cells[win]; winCell.classList.add('win'); setTimeout(()=> winCell.classList.remove('win'), 900);
-        const text = REWARDS[state.levelKey][win];
-        if(/^💎/.test(text)){ const val = parseInt(text.replace(/[^\d]/g,''),10); state.totalDiamonds += isNaN(val)?0:val; }
-        winSound(); flyShards(winCell); showToast(`🎉 مبروك! حصلت على ${text}`); showWinModal(text);
+        const cells=[...document.querySelectorAll('.cell')];
+        let index=0,loops=0,winningIndex=Math.floor(Math.random()*cells.length);
+        await new Promise(resolve=>{
+          function step(){
+            cells.forEach(c=>c.classList.remove("active"));
+            cells[index].classList.add("active");
+            index=(index+1)%cells.length;loops++;
+            if(loops>cells.length*3 && index===winningIndex){
+              cells.forEach(c=>c.classList.remove("active"));
+              const winCell=cells[winningIndex];winCell.classList.add("win");
+              document.getElementById("winText").textContent=`لقد حصلت على ${winCell.textContent}`;
+              document.getElementById("modal").setAttribute("open","");
+              resolve();
+            } else setTimeout(step,100);
+          } step();
+        });
       }
     }
-    document.getElementById('spin1').addEventListener('click', ()=> doSpin(1));
-    document.getElementById('spin10').addEventListener('click', ()=> doSpin(10));
-    tabs.addEventListener('click', (e)=>{
-      const btn = e.target.closest('.tab'); if(!btn) return;
-      document.querySelectorAll('.tab').forEach(t=>t.dataset.active='false'); btn.dataset.active='true';
-      const next = btn.dataset.level; if(next===state.levelKey) return;
-      state.levelKey = next; buildGrid(state.levelKey); updateHeader();
-    });
-    buildGrid(state.levelKey); updateHeader();
+
+    document.getElementById("spin1").addEventListener("click",()=>spinAnimation(1));
+    document.getElementById("spin10").addEventListener("click",()=>spinAnimation(10));
+
+    setLevel("basic");
+    updateProgress();
   </script>
 </body>
 </html>
